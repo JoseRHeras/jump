@@ -10,19 +10,12 @@ FICTIONAL_CHARACTERS_URL = os.getenv('FICTIONAL_CHARACTERS_URL')
 FICTIONAL_CHARACTERS_HOST = os.getenv('FICTIONAL_CHARACTERS_HOST')
 
 
-class InvalidHeroValue(Exception):
-    pass
-
-
-def call_data_from_api(character_name: str, alignment: str) -> dict:
+def call_data_from_api(character_name: str) -> dict:
     """ 
-            Function takes the name of characters and its alignment (hero or villain)
-            It attempts to retrieve the characters data which is returned as a dictionary
+            Function takes the name of characters as parameter
+            It attempts to retrieve the characters data from API endpoint
     """
-    if alignment not in ['hero', 'villain']:
-        raise InvalidHeroValue
-
-    querystring = {alignment: character_name}
+    querystring = {'hero': character_name}
 
     headers = {
         "X-RapidAPI-Key": FICTIONAL_CHARACTERS_API_KEY,
@@ -32,12 +25,11 @@ def call_data_from_api(character_name: str, alignment: str) -> dict:
     response = requests.request(
         "GET", FICTIONAL_CHARACTERS_URL, headers=headers, params=querystring)
 
-    return response.json()
+    return response
 
 
 def format_data(data) -> dict:
     return {
-
         'name': data['name'],
         'intelligence': data['powerstats']['intelligence'],
         'strength': data['powerstats']['strength'],
@@ -50,6 +42,17 @@ def format_data(data) -> dict:
 
 
 def get_character_stats(name: str) -> dict:
+    """
+        Takes character name as parameter:
+        If found returns a dictionary representing character:
+        If not found then it returns an empty dictionary.
+    """
+    try:
+        response = call_data_from_api(character_name=name)
+        return format_data(response.json())
+    except Exception:
+        return {}
 
-    response = call_data_from_api(character_name=name, alignment='hero')
-    return format_data(response)
+    
+
+
