@@ -68,9 +68,29 @@ html_template = """
   </body>
 </html> 
 """
+html_template_nothing_found = """
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Character Card</title>
+  </head>
+  <body>
+    <p> Ooops was not able to find that character! :( </p>
+  </body>
+</html> 
+
+"""
 
 
-def get_character_card(name:str) -> str:
+def get_character_card(name: str) -> str:
+    """
+        Function takes the name of the character and returns an HTML file represented as string with that character data.
+        If no character is found then it returns the Nothing found HTML file
+    """
+
     data = get_character_stats(name=name)
+
+    if len(data) < 1:
+        return html_template_nothing_found
 
     return html_template.format(style=css_style, **data)
